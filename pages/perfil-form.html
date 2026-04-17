@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario Perfil | Proyecto JS</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/crud.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Proyecto JS</div>
+    <nav class="nav-links">
+      <a href="./dashboard.html">Inicio</a>
+      <a href="./perfiles.html">Perfiles</a>
+      <a href="#" id="logoutBtn">Cerrar sesión</a>
+    </nav>
+  </header>
+
+  <main class="main-container">
+    <section class="breadcrumbs">
+      <a href="./dashboard.html">Inicio</a>
+      <span>/</span>
+      <a href="./perfiles.html">Perfiles</a>
+      <span>/</span>
+      <span id="formTitleBreadcrumb">Nuevo</span>
+    </section>
+
+    <section class="page-header">
+      <div>
+        <h1 id="formTitle">Nuevo Perfil</h1>
+        <p>Completa la información del perfil.</p>
+      </div>
+    </section>
+
+    <section class="card form-card">
+      <form id="perfilForm">
+        <input type="hidden" id="perfilId" />
+
+        <div class="form-group">
+          <label for="nombrePerfil">Nombre del perfil</label>
+          <input type="text" id="nombrePerfil" required />
+        </div>
+
+        <div class="form-check">
+          <input type="checkbox" id="bitAdministrador" />
+          <label for="bitAdministrador">Es administrador</label>
+        </div>
+
+        <div class="form-actions">
+          <a href="./perfiles.html" class="btn btn-secondary">Cancelar</a>
+          <button type="submit" class="btn btn-primary">Guardar</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/perfiles.js"></script>
+</body>
+</html>
