@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Permisos Perfil</title>
+  <title>Permisos Perfil | Sistema Corporativo</title>
   <link rel="stylesheet" href="../assets/css/styles.css" />
 </head>
 <body>
@@ -18,93 +18,67 @@
           </div>
         </div>
 
-        <div class="topbar-user">
-          <span>admin</span>
+        <div class="topbar-right">
+          <span class="user-badge" id="topUserName">Usuario</span>
           <button class="logout-btn" id="logoutBtn">Salir</button>
         </div>
       </div>
     </header>
 
-    <div class="page-wrap">
-      <aside class="sidebar-card">
-        <div class="sidebar-title">Menú principal</div>
+    <nav class="main-nav">
+      <div class="main-nav-inner" id="dynamicTopNav"></div>
+    </nav>
 
-        <div class="accordion-group open">
-          <button type="button" class="accordion-header">Seguridad</button>
-          <div class="accordion-body">
-            <a class="sidebar-link" href="./perfiles.html">Perfil</a>
-            <a class="sidebar-link" href="./modulos.html">Modulo</a>
-            <a class="sidebar-link active" href="./permisos.html">Permisos-Perfil</a>
-            <a class="sidebar-link" href="./usuarios.html">Usuario</a>
+    <main class="page-container">
+      <div class="breadcrumbs">
+        Inicio / Seguridad / <strong>Permisos Perfil</strong>
+      </div>
+
+      <section class="page-header-card">
+        <h2>Permisos Perfil</h2>
+        <p>Asigna permisos por perfil usando una tabla tipo matriz.</p>
+      </section>
+
+      <section class="action-card">
+        <div class="form-group">
+          <label for="perfilFiltroPermisos">Perfil</label>
+          <div style="display:grid; grid-template-columns: 1fr auto; gap:10px;">
+            <select id="perfilFiltroPermisos"></select>
+            <button class="btn btn-green" id="btnBuscarPermisos">Buscar</button>
           </div>
         </div>
+      </section>
 
-        <div class="accordion-group open">
-          <button type="button" class="accordion-header">Principal 1</button>
-          <div class="accordion-body">
-            <a class="sidebar-link" href="./principal-1-1.html">Principal 1.1</a>
-            <a class="sidebar-link" href="./principal-1-2.html">Principal 1.2</a>
-          </div>
+      <section class="content-card">
+        <div class="table-wrap">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Módulo</th>
+                <th>Agregar</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+                <th>Consultar</th>
+                <th>Detalle</th>
+              </tr>
+            </thead>
+            <tbody id="permissionsMatrixBody"></tbody>
+          </table>
         </div>
 
-        <div class="accordion-group open">
-          <button type="button" class="accordion-header">Principal 2</button>
-          <div class="accordion-body">
-            <a class="sidebar-link" href="./principal-2-1.html">Principal 2.1</a>
-            <a class="sidebar-link" href="./principal-2-2.html">Principal 2.2</a>
-          </div>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+          <button class="btn btn-green" id="btnGuardarPermisos">Guardar</button>
+          <button class="btn btn-gray" id="btnCancelarPermisos">Cancelar</button>
         </div>
-      </aside>
-
-      <main class="main-content">
-        <div class="breadcrumbs">
-          Inicio / Seguridad / <strong>Permisos Perfil</strong>
-        </div>
-
-        <section class="content-header-card">
-          <h2>Permisos Perfil</h2>
-          <p>Asigna permisos por perfil usando una tabla tipo matriz.</p>
-        </section>
-
-        <section class="action-card">
-          <div class="form-group">
-            <label for="perfilFiltroPermisos">Perfil</label>
-            <div style="display:grid; grid-template-columns: 1fr auto; gap: 10px;">
-              <select id="perfilFiltroPermisos"></select>
-              <button class="btn btn-green" id="btnBuscarPermisos">Buscar</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="content-card">
-          <div class="table-wrap">
-            <table class="custom-table permissions-table">
-              <thead>
-                <tr>
-                  <th>Módulo</th>
-                  <th>Agregar</th>
-                  <th>Editar</th>
-                  <th>Eliminar</th>
-                  <th>Consultar</th>
-                  <th>Detalle</th>
-                </tr>
-              </thead>
-              <tbody id="permissionsMatrixBody"></tbody>
-            </table>
-          </div>
-
-          <div class="permissions-actions">
-            <button class="btn btn-green" id="btnGuardarPermisos">Guardar</button>
-            <button class="btn btn-gray" id="btnCancelarPermisos">Cancelar</button>
-          </div>
-        </section>
-      </main>
-    </div>
+      </section>
+    </main>
   </div>
 
-  <script src="../assets/js/data.js"></script>
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/layout.js"></script>
-  <script src="../assets/js/permisos-matriz.js"></script>
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/navbar-dropdown.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/module-permissions.js"></script>
+<script src="../assets/js/permisos-api.js"></script>
 </body>
 </html>

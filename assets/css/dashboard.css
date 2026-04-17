@@ -1,0 +1,33 @@
+.welcome-card {
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+.welcome-card h1 {
+  margin-bottom: 10px;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+}
+
+.module-card {
+  background: white;
+  border-radius: 18px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(15, 23, 42, 0.08);
+}
+
+.module-card h2 {
+  margin-bottom: 10px;
+}
+
+.module-card p {
+  margin-bottom: 16px;
+  color: #475569;
+}

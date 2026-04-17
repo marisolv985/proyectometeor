@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Principal 2.2 | Sistema Corporativo</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-wrap">
+          <div class="brand-logo">PC</div>
+          <div class="brand-text">
+            <h1>Sistema Corporativo</h1>
+            <p>Principal 2 / Principal 2.2</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <span class="user-badge" id="topUserName">Usuario</span>
+          <button class="logout-btn" id="logoutBtn">Salir</button>
+        </div>
+      </div>
+    </header>
+
+    <nav class="main-nav">
+      <div class="main-nav-inner" id="dynamicTopNav"></div>
+    </nav>
+
+    <main class="page-container">
+      <div class="breadcrumbs">
+        Inicio / Principal 2 / <strong>Principal 2.2</strong>
+      </div>
+
+      <section class="page-header-card">
+        <h2>Principal 2.2</h2>
+        <p>Pantalla estática final del menú principal 2.</p>
+      </section>
+
+      <section class="content-card">
+        <div class="btn-row" style="margin-bottom:16px;">
+          <button class="btn btn-green">Nuevo</button>
+          <button class="btn btn-blue">Consultar</button>
+          <button class="btn btn-orange">Editar</button>
+          <button class="btn btn-red">Eliminar</button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Nombre</label>
+            <input type="text" placeholder="Nombre" />
+          </div>
+
+          <div class="form-group">
+            <label>Correo</label>
+            <input type="email" placeholder="correo@ejemplo.com" />
+          </div>
+
+          <div class="form-group">
+            <label>Fecha</label>
+            <input type="date" />
+          </div>
+
+          <div class="form-group">
+            <label>Estado</label>
+            <select>
+              <option>Seleccione</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+          <button class="btn btn-green">Guardar</button>
+          <button class="btn btn-gray">Cancelar</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/navbar-dropdown.js"></script>
+  <script src="../assets/js/app.js"></script>
+</body>
+</html>

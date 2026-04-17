@@ -1,46 +1,29 @@
-function getUsers() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
+function saveToken(token) {
+  localStorage.setItem("proyecto_token", token);
 }
 
-function getSession() {
-  return JSON.parse(localStorage.getItem(STORAGE_KEYS.SESSION));
+function getToken() {
+  return localStorage.getItem("proyecto_token");
+}
+
+function clearToken() {
+  localStorage.removeItem("proyecto_token");
 }
 
 function saveSession(user) {
-  localStorage.setItem(STORAGE_KEYS.SESSION, JSON.stringify(user));
+  localStorage.setItem("proyecto_session", JSON.stringify(user));
+}
+
+function getSession() {
+  return JSON.parse(localStorage.getItem("proyecto_session"));
 }
 
 function clearSession() {
-  localStorage.removeItem(STORAGE_KEYS.SESSION);
-}
-
-function login(correo, password) {
-  const users = getUsers();
-
-  const user = users.find(
-    (u) => u.correo === correo && u.password === password
-  );
-
-  if (!user) {
-    return { ok: false, message: "Correo o contraseña incorrectos." };
-  }
-
-  if (user.estado !== "Activo") {
-    return { ok: false, message: "La cuenta está inactiva." };
-  }
-
-  saveSession(user);
-  return { ok: true, user };
-}
-
-function requireAuth() {
-  const session = getSession();
-  if (!session) {
-    window.location.href = "../pages/login.html";
-  }
+  localStorage.removeItem("proyecto_session");
 }
 
 function logout() {
+  clearToken();
   clearSession();
   window.location.href = "../pages/login.html";
 }
@@ -53,4 +36,32 @@ function bindLogoutButton() {
       logout();
     });
   }
+}
+
+function requireAuth() {
+  const token = getToken();
+  if (!token) {
+    window.location.href = "../pages/login.html";
+  }
+}
+
+async function fetchWithAuth(url, options = {}) {
+  const token = getToken();
+
+  const headers = {
+    ...(options.headers || {}),
+    Authorization: `Bearer ${token}`
+  };
+
+  const response = await fetch(url, {
+    ...options,
+    headers
+  });
+
+  if (response.status === 401) {
+    logout();
+    throw new Error("Sesión expirada");
+  }
+
+  return response;
 }

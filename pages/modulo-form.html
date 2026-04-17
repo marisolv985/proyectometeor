@@ -3,71 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario Módulo | Proyecto JS</title>
+  <title>Formulario Módulo | Sistema Corporativo</title>
   <link rel="stylesheet" href="../assets/css/styles.css" />
-  <link rel="stylesheet" href="../assets/css/crud.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Proyecto JS</div>
-    <nav class="nav-links" id="mainNav"></nav>
-  </header>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-wrap">
+          <div class="brand-logo">PC</div>
+          <div class="brand-text">
+            <h1>Sistema Corporativo</h1>
+            <p>Seguridad / Módulo</p>
+          </div>
+        </div>
 
-  <main class="main-container">
-    <section class="breadcrumbs">
-      <a href="./dashboard.html">Inicio</a>
-      <span>/</span>
-      <a href="./modulos.html">Módulos</a>
-      <span>/</span>
-      <span id="moduloFormTitleBreadcrumb">Nuevo</span>
-    </section>
-
-    <section class="page-header">
-      <div>
-        <h1 id="moduloFormTitle">Nuevo Módulo</h1>
-        <p>Completa la información del módulo.</p>
+        <div class="topbar-right">
+          <span class="user-badge" id="topUserName">Usuario</span>
+          <button class="logout-btn" id="logoutBtn">Salir</button>
+        </div>
       </div>
-    </section>
+    </header>
 
-    <section class="card form-card">
-      <form id="moduloForm">
-        <input type="hidden" id="moduloId" />
+    <nav class="main-nav">
+      <div class="main-nav-inner" id="dynamicTopNav"></div>
+    </nav>
 
-        <div class="form-group">
-          <label for="nombreModulo">Nombre del módulo</label>
-          <input type="text" id="nombreModulo" required />
-        </div>
+    <main class="page-container">
+      <div class="breadcrumbs" id="moduloFormBreadcrumb">
+        Inicio / Seguridad / Módulo / <strong>Nuevo</strong>
+      </div>
 
-        <div class="form-group">
-          <label for="claveModulo">Clave</label>
-          <input type="text" id="claveModulo" required />
-        </div>
+      <section class="page-header-card">
+        <h2 id="moduloFormTitle">Nuevo Módulo</h2>
+        <p id="moduloFormSubtitle">Captura la información del módulo.</p>
+      </section>
 
-        <div class="form-group">
-          <label for="rutaModulo">Ruta</label>
-          <input type="text" id="rutaModulo" placeholder="./perfiles.html" required />
-        </div>
+      <section class="content-card">
+        <form id="moduloForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="strNombreModulo">Nombre del módulo</label>
+              <input type="text" id="strNombreModulo" placeholder="Ej. Auditoría" required />
+            </div>
 
-        <div class="form-group">
-          <label for="tipoModulo">Tipo</label>
-          <select id="tipoModulo" required>
-            <option value="">Selecciona una opción</option>
-            <option value="CRUD">CRUD</option>
-            <option value="ESTATICO">Estático</option>
-          </select>
-        </div>
+            <div class="form-group">
+              <label for="strClaveModulo">Clave del módulo</label>
+              <input type="text" id="strClaveModulo" placeholder="Ej. auditoria" required />
+            </div>
 
-        <div class="form-actions">
-          <a href="./modulos.html" class="btn btn-secondary">Cancelar</a>
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-      </form>
-    </section>
-  </main>
+            <div class="form-group">
+              <label for="strRutaModulo">Ruta del módulo</label>
+              <input type="text" id="strRutaModulo" placeholder="Ej. /seguridad/auditoria" required />
+            </div>
 
-  <script src="../assets/js/data.js"></script>
+            <div class="form-group">
+              <label for="bitEstatico">¿Es estático?</label>
+              <select id="bitEstatico" required>
+                <option value="false">No</option>
+                <option value="true">Sí</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="idMenu">Menú padre</label>
+              <select id="idMenu" required></select>
+            </div>
+          </div>
+
+          <div id="moduloFormMessage" class="message-box"></div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+            <button type="submit" class="btn btn-green">Guardar</button>
+            <a href="./modulos.html" class="btn btn-gray">Cancelar</a>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
   <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/permissions.js"></script>
-  <script src="../assets/js/modulos.js"></script>
+  <script src="../assets/js/navbar-dropdown.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/module-permissions.js"></script>
+  <script src="../assets/js/modulo-form.js"></script>
 </body>
 </html>

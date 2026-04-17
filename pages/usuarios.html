@@ -3,62 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usuarios | Proyecto JS</title>
+  <title>Usuario | Sistema Corporativo</title>
   <link rel="stylesheet" href="../assets/css/styles.css" />
-  <link rel="stylesheet" href="../assets/css/crud.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Proyecto JS</div>
-    <nav class="nav-links" id="mainNav"></nav>
-  </header>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-wrap">
+          <div class="brand-logo">PC</div>
+          <div class="brand-text">
+            <h1>Sistema Corporativo</h1>
+            <p>Seguridad / Usuario</p>
+          </div>
+        </div>
 
-  <main class="main-container">
-    <section class="breadcrumbs">
-      <a href="./dashboard.html">Inicio</a>
-      <span>/</span>
-      <span>Usuarios</span>
-    </section>
-
-    <section class="page-header">
-      <div>
-        <h1>Gestión de Usuarios</h1>
-        <p>Consulta, crea, edita, elimina y visualiza usuarios.</p>
-      </div>
-      <a href="./usuario-form.html" class="btn btn-primary" id="btnNuevoUsuario">Nuevo usuario</a>
-    </section>
-
-    <section class="card">
-      <div class="toolbar">
-        <div class="search-box">
-          <input type="text" id="usuarioSearch" placeholder="Buscar usuario..." />
+        <div class="topbar-right">
+          <span class="user-badge" id="topUserName">Usuario</span>
+          <button class="logout-btn" id="logoutBtn">Salir</button>
         </div>
       </div>
+    </header>
 
-      <div class="table-responsive">
-        <table class="custom-table">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Nombre</th>
-              <th>Correo</th>
-              <th>Perfil</th>
-              <th>Estado</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody id="usuariosTableBody"></tbody>
-        </table>
+    <nav class="main-nav">
+      <div class="main-nav-inner" id="dynamicTopNav"></div>
+    </nav>
+
+    <main class="page-container">
+      <div class="breadcrumbs">
+        Inicio / Seguridad / <strong>Usuario</strong>
       </div>
 
-      <div class="pagination" id="usuariosPagination"></div>
-    </section>
-  </main>
+      <section class="page-header-card">
+        <h2>Módulo Usuario</h2>
+        <p>Gestión de usuarios con imagen, perfil, estado y contacto.</p>
+      </section>
 
-  <script src="../assets/js/data.js"></script>
-  <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/ui.js"></script>
-  <script src="../assets/js/permissions.js"></script>
-  <script src="../assets/js/usuarios.js"></script>
+      <section class="action-card">
+        <div class="btn-row">
+          <button class="btn btn-green" id="btnNuevoUsuario">Nuevo</button>
+          <button class="btn btn-blue" id="btnRecargarUsuarios">Consultar</button>
+        </div>
+      </section>
+
+      <section class="content-card">
+        <div class="table-wrap">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Imagen</th>
+                <th>Usuario</th>
+                <th>Perfil</th>
+                <th>Estado</th>
+                <th>Correo</th>
+                <th>Celular</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody id="usuariosTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script src="../assets/js/config.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/navbar-dropdown.js"></script>
+<script src="../assets/js/app.js"></script>
+<script src="../assets/js/module-permissions.js"></script>
+<script src="../assets/js/usuarios-api.js"></script>
 </body>
 </html>

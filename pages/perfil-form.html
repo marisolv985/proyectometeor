@@ -3,57 +3,75 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Formulario Perfil | Proyecto JS</title>
+  <title>Formulario Perfil | Sistema Corporativo</title>
   <link rel="stylesheet" href="../assets/css/styles.css" />
-  <link rel="stylesheet" href="../assets/css/crud.css" />
 </head>
 <body>
-  <header class="topbar">
-    <div class="brand">Proyecto JS</div>
-    <nav class="nav-links" id="mainNav"></nav>
-  </header>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand-wrap">
+          <div class="brand-logo">PC</div>
+          <div class="brand-text">
+            <h1>Sistema Corporativo</h1>
+            <p>Seguridad / Perfil</p>
+          </div>
+        </div>
 
-  <main class="main-container">
-    <section class="breadcrumbs">
-      <a href="./dashboard.html">Inicio</a>
-      <span>/</span>
-      <a href="./perfiles.html">Perfiles</a>
-      <span>/</span>
-      <span id="formTitleBreadcrumb">Nuevo</span>
-    </section>
-
-    <section class="page-header">
-      <div>
-        <h1 id="formTitle">Nuevo Perfil</h1>
-        <p>Completa la información del perfil.</p>
+        <div class="topbar-right">
+          <span class="user-badge" id="topUserName">Usuario</span>
+          <button class="logout-btn" id="logoutBtn">Salir</button>
+        </div>
       </div>
-    </section>
+    </header>
 
-    <section class="card form-card">
-      <form id="perfilForm">
-        <input type="hidden" id="perfilId" />
+    <nav class="main-nav">
+      <div class="main-nav-inner" id="dynamicTopNav"></div>
+    </nav>
 
-        <div class="form-group">
-          <label for="nombrePerfil">Nombre del perfil</label>
-          <input type="text" id="nombrePerfil" required />
-        </div>
+    <main class="page-container">
+      <div class="breadcrumbs" id="perfilFormBreadcrumb">
+        Inicio / Seguridad / Perfil / <strong>Nuevo</strong>
+      </div>
 
-        <div class="form-check">
-          <input type="checkbox" id="bitAdministrador" />
-          <label for="bitAdministrador">Es administrador</label>
-        </div>
+      <section class="page-header-card">
+        <h2 id="perfilFormTitle">Nuevo Perfil</h2>
+        <p id="perfilFormSubtitle">Captura la información del perfil.</p>
+      </section>
 
-        <div class="form-actions">
-          <a href="./perfiles.html" class="btn btn-secondary">Cancelar</a>
-          <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-      </form>
-    </section>
-  </main>
+      <section class="content-card">
+        <form id="perfilForm">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="strNombrePerfil">Nombre del perfil</label>
+              <input type="text" id="strNombrePerfil" placeholder="Ej. Supervisor" required />
+            </div>
 
-  <script src="../assets/js/data.js"></script>
+            <div class="form-group">
+              <label for="bitAdministrador">Administrador</label>
+              <select id="bitAdministrador" required>
+                <option value="false">No</option>
+                <option value="true">Sí</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="perfilFormMessage" class="message-box"></div>
+
+          <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:18px;">
+            <button type="submit" class="btn btn-green" id="btnGuardarPerfil">Guardar</button>
+            <a href="./perfiles.html" class="btn btn-gray">Cancelar</a>
+          </div>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <script src="../assets/js/config.js"></script>
   <script src="../assets/js/auth.js"></script>
-  <script src="../assets/js/permissions.js"></script>
-  <script src="../assets/js/perfiles.js"></script>
+  <script src="../assets/js/navbar-dropdown.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/module-permissions.js"></script>
+  <script src="../assets/js/perfil-form.js"></script>
 </body>
 </html>
