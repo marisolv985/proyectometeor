@@ -23,12 +23,18 @@
     <section class="page-header">
       <div>
         <h1>Gestión de Perfiles</h1>
-        <p>Consulta, crea, edita y elimina perfiles.</p>
+        <p>Consulta, crea, edita, elimina y visualiza perfiles.</p>
       </div>
-      <a href="./perfil-form.html" class="btn btn-primary">Nuevo perfil</a>
+      <a href="./perfil-form.html" class="btn btn-primary" id="btnNuevoPerfil">Nuevo perfil</a>
     </section>
 
     <section class="card">
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="perfilSearch" placeholder="Buscar perfil..." />
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
@@ -42,6 +48,8 @@
           <tbody id="perfilesTableBody"></tbody>
         </table>
       </div>
+
+      <div class="pagination" id="perfilesPagination"></div>
     </section>
   </main>
 

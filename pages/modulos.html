@@ -23,12 +23,18 @@
     <section class="page-header">
       <div>
         <h1>Gestión de Módulos</h1>
-        <p>Consulta, crea, edita y elimina módulos.</p>
+        <p>Consulta, crea, edita, elimina y visualiza módulos.</p>
       </div>
-      <a href="./modulo-form.html" class="btn btn-primary">Nuevo módulo</a>
+      <a href="./modulo-form.html" class="btn btn-primary" id="btnNuevoModulo">Nuevo módulo</a>
     </section>
 
     <section class="card">
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="moduloSearch" placeholder="Buscar módulo..." />
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
@@ -44,6 +50,8 @@
           <tbody id="modulosTableBody"></tbody>
         </table>
       </div>
+
+      <div class="pagination" id="modulosPagination"></div>
     </section>
   </main>
 

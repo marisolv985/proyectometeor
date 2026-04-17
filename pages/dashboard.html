@@ -10,13 +10,7 @@
 <body>
   <header class="topbar">
     <div class="brand">Proyecto JS</div>
-    <nav class="nav-links">
-      <a href="./dashboard.html">Inicio</a>
-      <a href="./perfiles.html">Perfiles</a>
-      <a href="./modulos.html">Módulos</a>
-      <a href="./usuarios.html">Usuarios</a>
-      <a href="#" id="logoutBtn">Cerrar sesión</a>
-    </nav>
+    <nav class="nav-links" id="mainNav"></nav>
   </header>
 
   <main class="main-container">
@@ -29,35 +23,27 @@
       <p id="welcomeUser"></p>
     </section>
 
-    <section class="cards-grid">
-      <div class="module-card">
-        <h2>Perfiles</h2>
-        <p>Administra los perfiles del sistema.</p>
-        <a href="./perfiles.html" class="btn btn-primary">Ir al módulo</a>
-      </div>
-
-      <div class="module-card">
-        <h2>Módulos</h2>
-        <p>Administra los módulos del sistema.</p>
-        <a href="./modulos.html" class="btn btn-primary">Ir al módulo</a>
-      </div>
-
-      <div class="module-card">
-        <h2>Usuarios</h2>
-        <p>Administra los usuarios del sistema.</p>
-        <a href="./usuarios.html" class="btn btn-primary">Ir al módulo</a>
-      </div>
-
-      <div class="module-card">
-        <h2>Permisos Perfil</h2>
-        <p>Se agregará en el siguiente bloque.</p>
-        <button class="btn btn-secondary" disabled>No disponible</button>
-      </div>
-    </section>
+    <section class="cards-grid" id="dashboardCards"></section>
   </main>
 
   <script src="../assets/js/data.js"></script>
   <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/permissions.js"></script>
   <script src="../assets/js/app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const cardsContainer = document.getElementById("dashboardCards");
+      const modulos = JSON.parse(localStorage.getItem(STORAGE_KEYS.MODULOS)) || [];
+      const visibles = modulos.filter((m) => hasPermission(m.nombre, "consulta") && m.nombre !== "Dashboard");
+
+      cardsContainer.innerHTML = visibles.map((modulo) => `
+        <div class="module-card">
+          <h2>${modulo.nombre}</h2>
+          <p>Accede al módulo ${modulo.nombre}.</p>
+          <a href="${modulo.ruta}" class="btn btn-primary">Ir al módulo</a>
+        </div>
+      `).join("");
+    });
+  </script>
 </body>
 </html>

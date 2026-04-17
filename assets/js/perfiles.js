@@ -1,3 +1,6 @@
+let perfilesCurrentPage = 1;
+let perfilesSearchTerm = "";
+
 function getPerfiles() {
   return JSON.parse(localStorage.getItem(STORAGE_KEYS.PERFILES)) || [];
 }
@@ -11,28 +14,39 @@ function getNextPerfilId(perfiles) {
   return Math.max(...perfiles.map((p) => p.id)) + 1;
 }
 
+function getFilteredPerfiles() {
+  const perfiles = getPerfiles();
+  return perfiles.filter((perfil) =>
+    perfil.nombre.toLowerCase().includes(perfilesSearchTerm.toLowerCase())
+  );
+}
+
 function renderPerfilesTable() {
   const tableBody = document.getElementById("perfilesTableBody");
   if (!tableBody) return;
 
-  const perfiles = getPerfiles();
+  const filtered = getFilteredPerfiles();
+  const paginated = paginateData(filtered, perfilesCurrentPage, 5);
+  perfilesCurrentPage = paginated.currentPage;
 
-  if (perfiles.length === 0) {
+  if (filtered.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="4">No hay perfiles registrados.</td>
+        <td colspan="4" class="empty-state">No hay perfiles registrados.</td>
       </tr>
     `;
+    renderPagination("perfilesPagination", 0, 1, "setPerfilesPage", 5);
     return;
   }
 
-  tableBody.innerHTML = perfiles.map((perfil, index) => `
+  tableBody.innerHTML = paginated.items.map((perfil, index) => `
     <tr>
-      <td>${index + 1}</td>
-      <td>${perfil.nombre}</td>
-      <td>${perfil.administrador ? "Sí" : "No"}</td>
+      <td>${(paginated.currentPage - 1) * 5 + index + 1}</td>
+      <td>${escapeHtml(perfil.nombre)}</td>
+      <td>${perfil.administrador ? '<span class="badge-yes">Sí</span>' : '<span class="badge-no">No</span>'}</td>
       <td>
         <div class="actions">
+          <button class="btn btn-info perfil-detail-btn" onclick="showPerfilDetail(${perfil.id})">Detalle</button>
           <a class="btn btn-warning perfil-edit-btn" href="./perfil-form.html?id=${perfil.id}">Editar</a>
           <button class="btn btn-danger perfil-delete-btn" onclick="deletePerfil(${perfil.id})">Eliminar</button>
         </div>
@@ -40,23 +54,47 @@ function renderPerfilesTable() {
     </tr>
   `).join("");
 
+  renderPagination("perfilesPagination", filtered.length, perfilesCurrentPage, "setPerfilesPage", 5);
+
+  protectButtonsByPermission(".perfil-detail-btn", "Perfiles", "detalle");
   protectButtonsByPermission(".perfil-edit-btn", "Perfiles", "editar");
   protectButtonsByPermission(".perfil-delete-btn", "Perfiles", "eliminar");
 }
 
-function deletePerfil(id) {
-  if (!hasPermission("Perfiles", "eliminar")) {
-    alert("No tienes permiso para eliminar.");
+function setPerfilesPage(page) {
+  perfilesCurrentPage = page;
+  renderPerfilesTable();
+}
+
+function showPerfilDetail(id) {
+  if (!hasPermission("Perfiles", "detalle")) {
+    showAlert("No tienes permiso para ver detalle.", "error");
     return;
   }
 
-  const confirmed = confirmDelete("¿Seguro que deseas eliminar este perfil?");
-  if (!confirmed) return;
+  const perfil = getPerfiles().find((p) => p.id === id);
+  if (!perfil) return;
 
-  let perfiles = getPerfiles();
-  perfiles = perfiles.filter((perfil) => perfil.id !== id);
-  savePerfiles(perfiles);
-  renderPerfilesTable();
+  renderDetailModal("Detalle del Perfil", {
+    "ID": perfil.id,
+    "Nombre": perfil.nombre,
+    "Administrador": perfil.administrador ? "Sí" : "No"
+  });
+}
+
+function deletePerfil(id) {
+  if (!hasPermission("Perfiles", "eliminar")) {
+    showAlert("No tienes permiso para eliminar.", "error");
+    return;
+  }
+
+  confirmDeleteModal("¿Seguro que deseas eliminar este perfil?", () => {
+    let perfiles = getPerfiles();
+    perfiles = perfiles.filter((perfil) => perfil.id !== id);
+    savePerfiles(perfiles);
+    renderPerfilesTable();
+    showAlert("Perfil eliminado correctamente.", "success");
+  });
 }
 
 function loadPerfilForm() {
@@ -78,9 +116,7 @@ function loadPerfilForm() {
       return;
     }
 
-    const perfiles = getPerfiles();
-    const perfil = perfiles.find((p) => p.id === Number(id));
-
+    const perfil = getPerfiles().find((p) => p.id === Number(id));
     if (perfil) {
       formTitle.textContent = "Editar Perfil";
       formTitleBreadcrumb.textContent = "Editar";
@@ -104,39 +140,49 @@ function loadPerfilForm() {
     const administrador = bitAdministradorInput.checked;
 
     if (!nombre) {
-      alert("El nombre del perfil es obligatorio.");
+      showAlert("El nombre del perfil es obligatorio.", "error");
       return;
     }
 
     const duplicate = perfiles.find(
-      (p) =>
-        p.nombre.toLowerCase() === nombre.toLowerCase() &&
-        p.id !== Number(perfilId)
+      (p) => p.nombre.toLowerCase() === nombre.toLowerCase() && p.id !== Number(perfilId)
     );
 
     if (duplicate) {
-      alert("Ya existe un perfil con ese nombre.");
+      showAlert("Ya existe un perfil con ese nombre.", "error");
       return;
     }
 
     if (perfilId) {
       const updatedPerfiles = perfiles.map((p) =>
-        p.id === Number(perfilId)
-          ? { ...p, nombre, administrador }
-          : p
+        p.id === Number(perfilId) ? { ...p, nombre, administrador } : p
       );
       savePerfiles(updatedPerfiles);
+      showAlert("Perfil actualizado correctamente.", "success");
     } else {
-      const newPerfil = {
+      perfiles.push({
         id: getNextPerfilId(perfiles),
         nombre,
         administrador
-      };
-      perfiles.push(newPerfil);
+      });
       savePerfiles(perfiles);
+      showAlert("Perfil creado correctamente.", "success");
     }
 
-    window.location.href = "./perfiles.html";
+    setTimeout(() => {
+      window.location.href = "./perfiles.html";
+    }, 700);
+  });
+}
+
+function bindPerfilSearch() {
+  const input = document.getElementById("perfilSearch");
+  if (!input) return;
+
+  input.addEventListener("input", (e) => {
+    perfilesSearchTerm = e.target.value.trim();
+    perfilesCurrentPage = 1;
+    renderPerfilesTable();
   });
 }
 
@@ -145,7 +191,8 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMenu();
   renderPerfilesTable();
   loadPerfilForm();
+  bindPerfilSearch();
 
-  const newButton = document.querySelector('a[href="./perfil-form.html"]');
+  const newButton = document.getElementById("btnNuevoPerfil");
   protectButtonByPermission(newButton, "Perfiles", "agregar");
 });

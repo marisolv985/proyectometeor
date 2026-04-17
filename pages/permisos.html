@@ -48,12 +48,18 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary">Guardar permiso</button>
+          <button type="submit" class="btn btn-primary" id="btnGuardarPermiso">Guardar permiso</button>
         </div>
       </form>
     </section>
 
     <section class="card" style="margin-top: 20px;">
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="permisoSearch" placeholder="Buscar permiso..." />
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
@@ -72,6 +78,8 @@
           <tbody id="permisosTableBody"></tbody>
         </table>
       </div>
+
+      <div class="pagination" id="permisosPagination"></div>
     </section>
   </main>
 

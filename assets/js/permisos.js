@@ -1,3 +1,6 @@
+let permisosCurrentPage = 1;
+let permisosSearchTerm = "";
+
 function getPerfilesPermisos() {
   return JSON.parse(localStorage.getItem(STORAGE_KEYS.PERFILES)) || [];
 }
@@ -45,26 +48,39 @@ function badge(value) {
     : `<span class="badge-no">No</span>`;
 }
 
+function getFilteredPermisos() {
+  const permisos = getPermisos();
+  return permisos.filter((permiso) =>
+    [permiso.perfil, permiso.modulo]
+      .join(" ")
+      .toLowerCase()
+      .includes(permisosSearchTerm.toLowerCase())
+  );
+}
+
 function renderPermisosTable() {
   const tableBody = document.getElementById("permisosTableBody");
   if (!tableBody) return;
 
-  const permisos = getPermisos();
+  const filtered = getFilteredPermisos();
+  const paginated = paginateData(filtered, permisosCurrentPage, 5);
+  permisosCurrentPage = paginated.currentPage;
 
-  if (permisos.length === 0) {
+  if (filtered.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="9">No hay permisos registrados.</td>
+        <td colspan="9" class="empty-state">No hay permisos registrados.</td>
       </tr>
     `;
+    renderPagination("permisosPagination", 0, 1, "setPermisosPage", 5);
     return;
   }
 
-  tableBody.innerHTML = permisos.map((permiso, index) => `
+  tableBody.innerHTML = paginated.items.map((permiso, index) => `
     <tr>
-      <td>${index + 1}</td>
-      <td>${permiso.perfil}</td>
-      <td>${permiso.modulo}</td>
+      <td>${(paginated.currentPage - 1) * 5 + index + 1}</td>
+      <td>${escapeHtml(permiso.perfil)}</td>
+      <td>${escapeHtml(permiso.modulo)}</td>
       <td>${badge(permiso.agregar)}</td>
       <td>${badge(permiso.editar)}</td>
       <td>${badge(permiso.consulta)}</td>
@@ -72,28 +88,58 @@ function renderPermisosTable() {
       <td>${badge(permiso.detalle)}</td>
       <td>
         <div class="actions">
+          <button class="btn btn-info permiso-detail-btn" onclick="showPermisoDetail(${permiso.id})">Detalle</button>
           <button class="btn btn-danger permiso-delete-btn" onclick="deletePermiso(${permiso.id})">Eliminar</button>
         </div>
       </td>
     </tr>
   `).join("");
 
+  renderPagination("permisosPagination", filtered.length, permisosCurrentPage, "setPermisosPage", 5);
+
+  protectButtonsByPermission(".permiso-detail-btn", "Permisos Perfil", "detalle");
   protectButtonsByPermission(".permiso-delete-btn", "Permisos Perfil", "eliminar");
+}
+
+function setPermisosPage(page) {
+  permisosCurrentPage = page;
+  renderPermisosTable();
+}
+
+function showPermisoDetail(id) {
+  if (!hasPermission("Permisos Perfil", "detalle")) {
+    showAlert("No tienes permiso para ver detalle.", "error");
+    return;
+  }
+
+  const permiso = getPermisos().find((p) => p.id === id);
+  if (!permiso) return;
+
+  renderDetailModal("Detalle del Permiso", {
+    "ID": permiso.id,
+    "Perfil": permiso.perfil,
+    "Módulo": permiso.modulo,
+    "Agregar": permiso.agregar ? "Sí" : "No",
+    "Editar": permiso.editar ? "Sí" : "No",
+    "Consulta": permiso.consulta ? "Sí" : "No",
+    "Eliminar": permiso.eliminar ? "Sí" : "No",
+    "Detalle": permiso.detalle ? "Sí" : "No"
+  });
 }
 
 function deletePermiso(id) {
   if (!hasPermission("Permisos Perfil", "eliminar")) {
-    alert("No tienes permiso para eliminar.");
+    showAlert("No tienes permiso para eliminar.", "error");
     return;
   }
 
-  const confirmed = confirmDelete("¿Seguro que deseas eliminar este permiso?");
-  if (!confirmed) return;
-
-  let permisos = getPermisos();
-  permisos = permisos.filter((permiso) => permiso.id !== id);
-  savePermisos(permisos);
-  renderPermisosTable();
+  confirmDeleteModal("¿Seguro que deseas eliminar este permiso?", () => {
+    let permisos = getPermisos();
+    permisos = permisos.filter((permiso) => permiso.id !== id);
+    savePermisos(permisos);
+    renderPermisosTable();
+    showAlert("Permiso eliminado correctamente.", "success");
+  });
 }
 
 function bindPermisoForm() {
@@ -104,7 +150,7 @@ function bindPermisoForm() {
     e.preventDefault();
 
     if (!hasPermission("Permisos Perfil", "agregar") && !isAdminProfile()) {
-      alert("No tienes permiso para guardar.");
+      showAlert("No tienes permiso para guardar.", "error");
       return;
     }
 
@@ -117,7 +163,7 @@ function bindPermisoForm() {
     const detalle = document.getElementById("permDetalle").checked;
 
     if (!perfil || !modulo) {
-      alert("Perfil y módulo son obligatorios.");
+      showAlert("Perfil y módulo son obligatorios.", "error");
       return;
     }
 
@@ -131,6 +177,7 @@ function bindPermisoForm() {
           : p
       );
       savePermisos(updatedPermisos);
+      showAlert("Permiso actualizado correctamente.", "success");
     } else {
       permisos.push({
         id: getNextPermisoId(permisos),
@@ -143,9 +190,21 @@ function bindPermisoForm() {
         detalle
       });
       savePermisos(permisos);
+      showAlert("Permiso creado correctamente.", "success");
     }
 
     form.reset();
+    renderPermisosTable();
+  });
+}
+
+function bindPermisoSearch() {
+  const input = document.getElementById("permisoSearch");
+  if (!input) return;
+
+  input.addEventListener("input", (e) => {
+    permisosSearchTerm = e.target.value.trim();
+    permisosCurrentPage = 1;
     renderPermisosTable();
   });
 }
@@ -156,7 +215,8 @@ document.addEventListener("DOMContentLoaded", () => {
   loadPermisosSelects();
   bindPermisoForm();
   renderPermisosTable();
+  bindPermisoSearch();
 
-  const submitBtn = document.querySelector('#permisoPerfilForm button[type="submit"]');
+  const submitBtn = document.getElementById("btnGuardarPermiso");
   protectButtonByPermission(submitBtn, "Permisos Perfil", "agregar");
 });

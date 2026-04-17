@@ -1,3 +1,6 @@
+let modulosCurrentPage = 1;
+let modulosSearchTerm = "";
+
 function getModulos() {
   return JSON.parse(localStorage.getItem(STORAGE_KEYS.MODULOS)) || [];
 }
@@ -11,30 +14,44 @@ function getNextModuloId(modulos) {
   return Math.max(...modulos.map((m) => m.id)) + 1;
 }
 
+function getFilteredModulos() {
+  const modulos = getModulos();
+  return modulos.filter((modulo) =>
+    [modulo.nombre, modulo.clave, modulo.ruta, modulo.tipo]
+      .join(" ")
+      .toLowerCase()
+      .includes(modulosSearchTerm.toLowerCase())
+  );
+}
+
 function renderModulosTable() {
   const tableBody = document.getElementById("modulosTableBody");
   if (!tableBody) return;
 
-  const modulos = getModulos();
+  const filtered = getFilteredModulos();
+  const paginated = paginateData(filtered, modulosCurrentPage, 5);
+  modulosCurrentPage = paginated.currentPage;
 
-  if (modulos.length === 0) {
+  if (filtered.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="6">No hay módulos registrados.</td>
+        <td colspan="6" class="empty-state">No hay módulos registrados.</td>
       </tr>
     `;
+    renderPagination("modulosPagination", 0, 1, "setModulosPage", 5);
     return;
   }
 
-  tableBody.innerHTML = modulos.map((modulo, index) => `
+  tableBody.innerHTML = paginated.items.map((modulo, index) => `
     <tr>
-      <td>${index + 1}</td>
-      <td>${modulo.nombre}</td>
-      <td>${modulo.clave}</td>
-      <td>${modulo.ruta}</td>
-      <td>${modulo.tipo}</td>
+      <td>${(paginated.currentPage - 1) * 5 + index + 1}</td>
+      <td>${escapeHtml(modulo.nombre)}</td>
+      <td>${escapeHtml(modulo.clave)}</td>
+      <td>${escapeHtml(modulo.ruta)}</td>
+      <td>${escapeHtml(modulo.tipo)}</td>
       <td>
         <div class="actions">
+          <button class="btn btn-info modulo-detail-btn" onclick="showModuloDetail(${modulo.id})">Detalle</button>
           <a class="btn btn-warning modulo-edit-btn" href="./modulo-form.html?id=${modulo.id}">Editar</a>
           <button class="btn btn-danger modulo-delete-btn" onclick="deleteModulo(${modulo.id})">Eliminar</button>
         </div>
@@ -42,23 +59,49 @@ function renderModulosTable() {
     </tr>
   `).join("");
 
+  renderPagination("modulosPagination", filtered.length, modulosCurrentPage, "setModulosPage", 5);
+
+  protectButtonsByPermission(".modulo-detail-btn", "Módulos", "detalle");
   protectButtonsByPermission(".modulo-edit-btn", "Módulos", "editar");
   protectButtonsByPermission(".modulo-delete-btn", "Módulos", "eliminar");
 }
 
-function deleteModulo(id) {
-  if (!hasPermission("Módulos", "eliminar")) {
-    alert("No tienes permiso para eliminar.");
+function setModulosPage(page) {
+  modulosCurrentPage = page;
+  renderModulosTable();
+}
+
+function showModuloDetail(id) {
+  if (!hasPermission("Módulos", "detalle")) {
+    showAlert("No tienes permiso para ver detalle.", "error");
     return;
   }
 
-  const confirmed = confirmDelete("¿Seguro que deseas eliminar este módulo?");
-  if (!confirmed) return;
+  const modulo = getModulos().find((m) => m.id === id);
+  if (!modulo) return;
 
-  let modulos = getModulos();
-  modulos = modulos.filter((modulo) => modulo.id !== id);
-  saveModulos(modulos);
-  renderModulosTable();
+  renderDetailModal("Detalle del Módulo", {
+    "ID": modulo.id,
+    "Nombre": modulo.nombre,
+    "Clave": modulo.clave,
+    "Ruta": modulo.ruta,
+    "Tipo": modulo.tipo
+  });
+}
+
+function deleteModulo(id) {
+  if (!hasPermission("Módulos", "eliminar")) {
+    showAlert("No tienes permiso para eliminar.", "error");
+    return;
+  }
+
+  confirmDeleteModal("¿Seguro que deseas eliminar este módulo?", () => {
+    let modulos = getModulos();
+    modulos = modulos.filter((modulo) => modulo.id !== id);
+    saveModulos(modulos);
+    renderModulosTable();
+    showAlert("Módulo eliminado correctamente.", "success");
+  });
 }
 
 function loadModuloForm() {
@@ -83,9 +126,7 @@ function loadModuloForm() {
       return;
     }
 
-    const modulos = getModulos();
-    const modulo = modulos.find((m) => m.id === Number(id));
-
+    const modulo = getModulos().find((m) => m.id === Number(id));
     if (modulo) {
       formTitle.textContent = "Editar Módulo";
       formTitleBreadcrumb.textContent = "Editar";
@@ -113,7 +154,7 @@ function loadModuloForm() {
     const tipo = tipoModuloInput.value;
 
     if (!nombre || !clave || !ruta || !tipo) {
-      alert("Todos los campos son obligatorios.");
+      showAlert("Todos los campos son obligatorios.", "error");
       return;
     }
 
@@ -122,17 +163,16 @@ function loadModuloForm() {
     );
 
     if (duplicateClave) {
-      alert("Ya existe un módulo con esa clave.");
+      showAlert("Ya existe un módulo con esa clave.", "error");
       return;
     }
 
     if (moduloId) {
       const updatedModulos = modulos.map((m) =>
-        m.id === Number(moduloId)
-          ? { ...m, nombre, clave, ruta, tipo }
-          : m
+        m.id === Number(moduloId) ? { ...m, nombre, clave, ruta, tipo } : m
       );
       saveModulos(updatedModulos);
+      showAlert("Módulo actualizado correctamente.", "success");
     } else {
       modulos.push({
         id: getNextModuloId(modulos),
@@ -142,9 +182,23 @@ function loadModuloForm() {
         tipo
       });
       saveModulos(modulos);
+      showAlert("Módulo creado correctamente.", "success");
     }
 
-    window.location.href = "./modulos.html";
+    setTimeout(() => {
+      window.location.href = "./modulos.html";
+    }, 700);
+  });
+}
+
+function bindModuloSearch() {
+  const input = document.getElementById("moduloSearch");
+  if (!input) return;
+
+  input.addEventListener("input", (e) => {
+    modulosSearchTerm = e.target.value.trim();
+    modulosCurrentPage = 1;
+    renderModulosTable();
   });
 }
 
@@ -153,7 +207,8 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMenu();
   renderModulosTable();
   loadModuloForm();
+  bindModuloSearch();
 
-  const newButton = document.querySelector('a[href="./modulo-form.html"]');
+  const newButton = document.getElementById("btnNuevoModulo");
   protectButtonByPermission(newButton, "Módulos", "agregar");
 });

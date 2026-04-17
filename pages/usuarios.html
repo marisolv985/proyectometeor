@@ -23,12 +23,18 @@
     <section class="page-header">
       <div>
         <h1>Gestión de Usuarios</h1>
-        <p>Consulta, crea, edita y elimina usuarios.</p>
+        <p>Consulta, crea, edita, elimina y visualiza usuarios.</p>
       </div>
-      <a href="./usuario-form.html" class="btn btn-primary">Nuevo usuario</a>
+      <a href="./usuario-form.html" class="btn btn-primary" id="btnNuevoUsuario">Nuevo usuario</a>
     </section>
 
     <section class="card">
+      <div class="toolbar">
+        <div class="search-box">
+          <input type="text" id="usuarioSearch" placeholder="Buscar usuario..." />
+        </div>
+      </div>
+
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
@@ -44,6 +50,8 @@
           <tbody id="usuariosTableBody"></tbody>
         </table>
       </div>
+
+      <div class="pagination" id="usuariosPagination"></div>
     </section>
   </main>
 

@@ -1,3 +1,6 @@
+let usuariosCurrentPage = 1;
+let usuariosSearchTerm = "";
+
 function getUsuarios() {
   return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS)) || [];
 }
@@ -15,30 +18,44 @@ function getNextUsuarioId(usuarios) {
   return Math.max(...usuarios.map((u) => u.id)) + 1;
 }
 
+function getFilteredUsuarios() {
+  const usuarios = getUsuarios();
+  return usuarios.filter((usuario) =>
+    [usuario.nombre, usuario.correo, usuario.perfil, usuario.estado]
+      .join(" ")
+      .toLowerCase()
+      .includes(usuariosSearchTerm.toLowerCase())
+  );
+}
+
 function renderUsuariosTable() {
   const tableBody = document.getElementById("usuariosTableBody");
   if (!tableBody) return;
 
-  const usuarios = getUsuarios();
+  const filtered = getFilteredUsuarios();
+  const paginated = paginateData(filtered, usuariosCurrentPage, 5);
+  usuariosCurrentPage = paginated.currentPage;
 
-  if (usuarios.length === 0) {
+  if (filtered.length === 0) {
     tableBody.innerHTML = `
       <tr>
-        <td colspan="6">No hay usuarios registrados.</td>
+        <td colspan="6" class="empty-state">No hay usuarios registrados.</td>
       </tr>
     `;
+    renderPagination("usuariosPagination", 0, 1, "setUsuariosPage", 5);
     return;
   }
 
-  tableBody.innerHTML = usuarios.map((usuario, index) => `
+  tableBody.innerHTML = paginated.items.map((usuario, index) => `
     <tr>
-      <td>${index + 1}</td>
-      <td>${usuario.nombre}</td>
-      <td>${usuario.correo}</td>
-      <td>${usuario.perfil}</td>
-      <td>${usuario.estado}</td>
+      <td>${(paginated.currentPage - 1) * 5 + index + 1}</td>
+      <td>${escapeHtml(usuario.nombre)}</td>
+      <td>${escapeHtml(usuario.correo)}</td>
+      <td>${escapeHtml(usuario.perfil)}</td>
+      <td>${usuario.estado === "Activo" ? '<span class="badge-active">Activo</span>' : '<span class="badge-inactive">Inactivo</span>'}</td>
       <td>
         <div class="actions">
+          <button class="btn btn-info usuario-detail-btn" onclick="showUsuarioDetail(${usuario.id})">Detalle</button>
           <a class="btn btn-warning usuario-edit-btn" href="./usuario-form.html?id=${usuario.id}">Editar</a>
           <button class="btn btn-danger usuario-delete-btn" onclick="deleteUsuario(${usuario.id})">Eliminar</button>
         </div>
@@ -46,23 +63,49 @@ function renderUsuariosTable() {
     </tr>
   `).join("");
 
+  renderPagination("usuariosPagination", filtered.length, usuariosCurrentPage, "setUsuariosPage", 5);
+
+  protectButtonsByPermission(".usuario-detail-btn", "Usuarios", "detalle");
   protectButtonsByPermission(".usuario-edit-btn", "Usuarios", "editar");
   protectButtonsByPermission(".usuario-delete-btn", "Usuarios", "eliminar");
 }
 
-function deleteUsuario(id) {
-  if (!hasPermission("Usuarios", "eliminar")) {
-    alert("No tienes permiso para eliminar.");
+function setUsuariosPage(page) {
+  usuariosCurrentPage = page;
+  renderUsuariosTable();
+}
+
+function showUsuarioDetail(id) {
+  if (!hasPermission("Usuarios", "detalle")) {
+    showAlert("No tienes permiso para ver detalle.", "error");
     return;
   }
 
-  const confirmed = confirmDelete("¿Seguro que deseas eliminar este usuario?");
-  if (!confirmed) return;
+  const usuario = getUsuarios().find((u) => u.id === id);
+  if (!usuario) return;
 
-  let usuarios = getUsuarios();
-  usuarios = usuarios.filter((usuario) => usuario.id !== id);
-  saveUsuarios(usuarios);
-  renderUsuariosTable();
+  renderDetailModal("Detalle del Usuario", {
+    "ID": usuario.id,
+    "Nombre": usuario.nombre,
+    "Correo": usuario.correo,
+    "Perfil": usuario.perfil,
+    "Estado": usuario.estado
+  });
+}
+
+function deleteUsuario(id) {
+  if (!hasPermission("Usuarios", "eliminar")) {
+    showAlert("No tienes permiso para eliminar.", "error");
+    return;
+  }
+
+  confirmDeleteModal("¿Seguro que deseas eliminar este usuario?", () => {
+    let usuarios = getUsuarios();
+    usuarios = usuarios.filter((usuario) => usuario.id !== id);
+    saveUsuarios(usuarios);
+    renderUsuariosTable();
+    showAlert("Usuario eliminado correctamente.", "success");
+  });
 }
 
 function loadPerfilesSelect() {
@@ -70,12 +113,9 @@ function loadPerfilesSelect() {
   if (!perfilSelect) return;
 
   const perfiles = getPerfilesUsuarios();
-
   perfilSelect.innerHTML = `
     <option value="">Selecciona un perfil</option>
-    ${perfiles.map((perfil) => `
-      <option value="${perfil.nombre}">${perfil.nombre}</option>
-    `).join("")}
+    ${perfiles.map((perfil) => `<option value="${perfil.nombre}">${perfil.nombre}</option>`).join("")}
   `;
 }
 
@@ -104,9 +144,7 @@ function loadUsuarioForm() {
       return;
     }
 
-    const usuarios = getUsuarios();
-    const usuario = usuarios.find((u) => u.id === Number(id));
-
+    const usuario = getUsuarios().find((u) => u.id === Number(id));
     if (usuario) {
       formTitle.textContent = "Editar Usuario";
       formTitleBreadcrumb.textContent = "Editar";
@@ -136,7 +174,7 @@ function loadUsuarioForm() {
     const estado = estadoUsuarioInput.value;
 
     if (!nombre || !correo || !password || !perfil || !estado) {
-      alert("Todos los campos son obligatorios.");
+      showAlert("Todos los campos son obligatorios.", "error");
       return;
     }
 
@@ -145,7 +183,7 @@ function loadUsuarioForm() {
     );
 
     if (duplicateCorreo) {
-      alert("Ya existe un usuario con ese correo.");
+      showAlert("Ya existe un usuario con ese correo.", "error");
       return;
     }
 
@@ -156,6 +194,7 @@ function loadUsuarioForm() {
           : u
       );
       saveUsuarios(updatedUsuarios);
+      showAlert("Usuario actualizado correctamente.", "success");
     } else {
       usuarios.push({
         id: getNextUsuarioId(usuarios),
@@ -166,9 +205,23 @@ function loadUsuarioForm() {
         estado
       });
       saveUsuarios(usuarios);
+      showAlert("Usuario creado correctamente.", "success");
     }
 
-    window.location.href = "./usuarios.html";
+    setTimeout(() => {
+      window.location.href = "./usuarios.html";
+    }, 700);
+  });
+}
+
+function bindUsuarioSearch() {
+  const input = document.getElementById("usuarioSearch");
+  if (!input) return;
+
+  input.addEventListener("input", (e) => {
+    usuariosSearchTerm = e.target.value.trim();
+    usuariosCurrentPage = 1;
+    renderUsuariosTable();
   });
 }
 
@@ -177,7 +230,8 @@ document.addEventListener("DOMContentLoaded", () => {
   buildMenu();
   renderUsuariosTable();
   loadUsuarioForm();
+  bindUsuarioSearch();
 
-  const newButton = document.querySelector('a[href="./usuario-form.html"]');
+  const newButton = document.getElementById("btnNuevoUsuario");
   protectButtonByPermission(newButton, "Usuarios", "agregar");
 });
