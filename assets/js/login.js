@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const token = getToken();
   const session = getSession();
-  if (session) {
-    window.location.href = "../pages/dashboard.html";
+
+  if (token && session) {
+    goToDashboard();
     return;
   }
 
@@ -57,9 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
       loginMessage.textContent = "Inicio de sesión correcto.";
 
       setTimeout(() => {
-        window.location.href = "../pages/dashboard.html";
+        goToDashboard();
       }, 700);
     } catch (error) {
+      console.error(error);
       loginMessage.className = "message-box message-error";
       loginMessage.textContent = "Error de conexión con el servidor.";
     }

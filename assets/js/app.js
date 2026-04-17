@@ -1,5 +1,7 @@
 document.addEventListener("DOMContentLoaded", async () => {
-  requireAuth();
+  const allowed = requireAuth();
+  if (!allowed) return;
+
   bindLogoutButton();
 
   const session = getSession();
@@ -28,7 +30,9 @@ async function renderDynamicTopNav() {
 
     const grouped = {};
     result.data.forEach((item) => {
-      if (!grouped[item.strNombreMenu]) grouped[item.strNombreMenu] = [];
+      if (!grouped[item.strNombreMenu]) {
+        grouped[item.strNombreMenu] = [];
+      }
       grouped[item.strNombreMenu].push(item);
     });
 
@@ -73,7 +77,9 @@ function mapBackendRouteToFrontend(route) {
     "/principal1/principal-1-2": "./principal-1-2.html",
     "/principal2/principal-2-1": "./principal-2-1.html",
     "/principal2/principal-2-2": "./principal-2-2.html",
-    "/reportes": "./dashboard.html"
+    "/reportes": "./dashboard.html",
+    "/seguridad/auditoria": "./dashboard.html",
+    "/seguridad/bitacora": "./dashboard.html"
   };
 
   return map[route] || "./dashboard.html";

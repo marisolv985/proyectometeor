@@ -15,17 +15,26 @@ function saveSession(user) {
 }
 
 function getSession() {
-  return JSON.parse(localStorage.getItem("proyecto_session"));
+  const raw = localStorage.getItem("proyecto_session");
+  return raw ? JSON.parse(raw) : null;
 }
 
 function clearSession() {
   localStorage.removeItem("proyecto_session");
 }
 
+function goToLogin() {
+  window.location.href = "/pages/login.html";
+}
+
+function goToDashboard() {
+  window.location.href = "/pages/dashboard.html";
+}
+
 function logout() {
   clearToken();
   clearSession();
-  window.location.href = "../pages/login.html";
+  goToLogin();
 }
 
 function bindLogoutButton() {
@@ -40,13 +49,23 @@ function bindLogoutButton() {
 
 function requireAuth() {
   const token = getToken();
-  if (!token) {
-    window.location.href = "../pages/login.html";
+  const session = getSession();
+
+  if (!token || !session) {
+    goToLogin();
+    return false;
   }
+
+  return true;
 }
 
 async function fetchWithAuth(url, options = {}) {
   const token = getToken();
+
+  if (!token) {
+    goToLogin();
+    throw new Error("Token no encontrado");
+  }
 
   const headers = {
     ...(options.headers || {}),
