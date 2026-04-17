@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
   requireAuth();
-  bindLogoutButton();
+  buildMenu();
 
   const session = getSession();
   const welcomeUser = document.getElementById("welcomeUser");

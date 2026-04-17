@@ -39,15 +39,23 @@ function renderUsuariosTable() {
       <td>${usuario.estado}</td>
       <td>
         <div class="actions">
-          <a class="btn btn-warning" href="./usuario-form.html?id=${usuario.id}">Editar</a>
-          <button class="btn btn-danger" onclick="deleteUsuario(${usuario.id})">Eliminar</button>
+          <a class="btn btn-warning usuario-edit-btn" href="./usuario-form.html?id=${usuario.id}">Editar</a>
+          <button class="btn btn-danger usuario-delete-btn" onclick="deleteUsuario(${usuario.id})">Eliminar</button>
         </div>
       </td>
     </tr>
   `).join("");
+
+  protectButtonsByPermission(".usuario-edit-btn", "Usuarios", "editar");
+  protectButtonsByPermission(".usuario-delete-btn", "Usuarios", "eliminar");
 }
 
 function deleteUsuario(id) {
+  if (!hasPermission("Usuarios", "eliminar")) {
+    alert("No tienes permiso para eliminar.");
+    return;
+  }
+
   const confirmed = confirmDelete("¿Seguro que deseas eliminar este usuario?");
   if (!confirmed) return;
 
@@ -91,6 +99,11 @@ function loadUsuarioForm() {
   const estadoUsuarioInput = document.getElementById("estadoUsuario");
 
   if (id) {
+    if (!hasPermission("Usuarios", "editar")) {
+      window.location.href = "./error-403.html";
+      return;
+    }
+
     const usuarios = getUsuarios();
     const usuario = usuarios.find((u) => u.id === Number(id));
 
@@ -103,6 +116,11 @@ function loadUsuarioForm() {
       passwordUsuarioInput.value = usuario.password;
       perfilUsuarioInput.value = usuario.perfil;
       estadoUsuarioInput.value = usuario.estado;
+    }
+  } else {
+    if (!hasPermission("Usuarios", "agregar")) {
+      window.location.href = "./error-403.html";
+      return;
     }
   }
 
@@ -139,15 +157,14 @@ function loadUsuarioForm() {
       );
       saveUsuarios(updatedUsuarios);
     } else {
-      const newUsuario = {
+      usuarios.push({
         id: getNextUsuarioId(usuarios),
         nombre,
         correo,
         password,
         perfil,
         estado
-      };
-      usuarios.push(newUsuario);
+      });
       saveUsuarios(usuarios);
     }
 
@@ -156,8 +173,11 @@ function loadUsuarioForm() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  requireAuth();
-  bindLogoutButton();
+  requireModuleAccess("Usuarios");
+  buildMenu();
   renderUsuariosTable();
   loadUsuarioForm();
+
+  const newButton = document.querySelector('a[href="./usuario-form.html"]');
+  protectButtonByPermission(newButton, "Usuarios", "agregar");
 });

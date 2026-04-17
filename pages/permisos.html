@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Permisos Perfil | Proyecto JS</title>
+  <link rel="stylesheet" href="../assets/css/styles.css" />
+  <link rel="stylesheet" href="../assets/css/crud.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">Proyecto JS</div>
+    <nav class="nav-links" id="mainNav"></nav>
+  </header>
+
+  <main class="main-container">
+    <section class="breadcrumbs">
+      <a href="./dashboard.html">Inicio</a>
+      <span>/</span>
+      <span>Permisos Perfil</span>
+    </section>
+
+    <section class="page-header">
+      <div>
+        <h1>Gestión de Permisos por Perfil</h1>
+        <p>Asigna permisos por módulo a cada perfil.</p>
+      </div>
+    </section>
+
+    <section class="card form-card">
+      <form id="permisoPerfilForm">
+        <div class="form-group">
+          <label for="perfilPermiso">Perfil</label>
+          <select id="perfilPermiso" required></select>
+        </div>
+
+        <div class="form-group">
+          <label for="moduloPermiso">Módulo</label>
+          <select id="moduloPermiso" required></select>
+        </div>
+
+        <div class="permissions-grid">
+          <label><input type="checkbox" id="permAgregar" /> Agregar</label>
+          <label><input type="checkbox" id="permEditar" /> Editar</label>
+          <label><input type="checkbox" id="permConsulta" /> Consulta</label>
+          <label><input type="checkbox" id="permEliminar" /> Eliminar</label>
+          <label><input type="checkbox" id="permDetalle" /> Detalle</label>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Guardar permiso</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="card" style="margin-top: 20px;">
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Perfil</th>
+              <th>Módulo</th>
+              <th>Agregar</th>
+              <th>Editar</th>
+              <th>Consulta</th>
+              <th>Eliminar</th>
+              <th>Detalle</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="permisosTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="../assets/js/data.js"></script>
+  <script src="../assets/js/auth.js"></script>
+  <script src="../assets/js/ui.js"></script>
+  <script src="../assets/js/permissions.js"></script>
+  <script src="../assets/js/permisos.js"></script>
+</body>
+</html>

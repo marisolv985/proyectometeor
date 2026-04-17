@@ -35,15 +35,23 @@ function renderModulosTable() {
       <td>${modulo.tipo}</td>
       <td>
         <div class="actions">
-          <a class="btn btn-warning" href="./modulo-form.html?id=${modulo.id}">Editar</a>
-          <button class="btn btn-danger" onclick="deleteModulo(${modulo.id})">Eliminar</button>
+          <a class="btn btn-warning modulo-edit-btn" href="./modulo-form.html?id=${modulo.id}">Editar</a>
+          <button class="btn btn-danger modulo-delete-btn" onclick="deleteModulo(${modulo.id})">Eliminar</button>
         </div>
       </td>
     </tr>
   `).join("");
+
+  protectButtonsByPermission(".modulo-edit-btn", "Módulos", "editar");
+  protectButtonsByPermission(".modulo-delete-btn", "Módulos", "eliminar");
 }
 
 function deleteModulo(id) {
+  if (!hasPermission("Módulos", "eliminar")) {
+    alert("No tienes permiso para eliminar.");
+    return;
+  }
+
   const confirmed = confirmDelete("¿Seguro que deseas eliminar este módulo?");
   if (!confirmed) return;
 
@@ -70,6 +78,11 @@ function loadModuloForm() {
   const tipoModuloInput = document.getElementById("tipoModulo");
 
   if (id) {
+    if (!hasPermission("Módulos", "editar")) {
+      window.location.href = "./error-403.html";
+      return;
+    }
+
     const modulos = getModulos();
     const modulo = modulos.find((m) => m.id === Number(id));
 
@@ -81,6 +94,11 @@ function loadModuloForm() {
       claveModuloInput.value = modulo.clave;
       rutaModuloInput.value = modulo.ruta;
       tipoModuloInput.value = modulo.tipo;
+    }
+  } else {
+    if (!hasPermission("Módulos", "agregar")) {
+      window.location.href = "./error-403.html";
+      return;
     }
   }
 
@@ -116,14 +134,13 @@ function loadModuloForm() {
       );
       saveModulos(updatedModulos);
     } else {
-      const newModulo = {
+      modulos.push({
         id: getNextModuloId(modulos),
         nombre,
         clave,
         ruta,
         tipo
-      };
-      modulos.push(newModulo);
+      });
       saveModulos(modulos);
     }
 
@@ -132,8 +149,11 @@ function loadModuloForm() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  requireAuth();
-  bindLogoutButton();
+  requireModuleAccess("Módulos");
+  buildMenu();
   renderModulosTable();
   loadModuloForm();
+
+  const newButton = document.querySelector('a[href="./modulo-form.html"]');
+  protectButtonByPermission(newButton, "Módulos", "agregar");
 });

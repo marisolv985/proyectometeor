@@ -33,15 +33,23 @@ function renderPerfilesTable() {
       <td>${perfil.administrador ? "Sí" : "No"}</td>
       <td>
         <div class="actions">
-          <a class="btn btn-warning" href="./perfil-form.html?id=${perfil.id}">Editar</a>
-          <button class="btn btn-danger" onclick="deletePerfil(${perfil.id})">Eliminar</button>
+          <a class="btn btn-warning perfil-edit-btn" href="./perfil-form.html?id=${perfil.id}">Editar</a>
+          <button class="btn btn-danger perfil-delete-btn" onclick="deletePerfil(${perfil.id})">Eliminar</button>
         </div>
       </td>
     </tr>
   `).join("");
+
+  protectButtonsByPermission(".perfil-edit-btn", "Perfiles", "editar");
+  protectButtonsByPermission(".perfil-delete-btn", "Perfiles", "eliminar");
 }
 
 function deletePerfil(id) {
+  if (!hasPermission("Perfiles", "eliminar")) {
+    alert("No tienes permiso para eliminar.");
+    return;
+  }
+
   const confirmed = confirmDelete("¿Seguro que deseas eliminar este perfil?");
   if (!confirmed) return;
 
@@ -65,6 +73,11 @@ function loadPerfilForm() {
   const bitAdministradorInput = document.getElementById("bitAdministrador");
 
   if (id) {
+    if (!hasPermission("Perfiles", "editar")) {
+      window.location.href = "./error-403.html";
+      return;
+    }
+
     const perfiles = getPerfiles();
     const perfil = perfiles.find((p) => p.id === Number(id));
 
@@ -74,6 +87,11 @@ function loadPerfilForm() {
       perfilIdInput.value = perfil.id;
       nombrePerfilInput.value = perfil.nombre;
       bitAdministradorInput.checked = perfil.administrador;
+    }
+  } else {
+    if (!hasPermission("Perfiles", "agregar")) {
+      window.location.href = "./error-403.html";
+      return;
     }
   }
 
@@ -123,8 +141,11 @@ function loadPerfilForm() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  requireAuth();
-  bindLogoutButton();
+  requireModuleAccess("Perfiles");
+  buildMenu();
   renderPerfilesTable();
   loadPerfilForm();
+
+  const newButton = document.querySelector('a[href="./perfil-form.html"]');
+  protectButtonByPermission(newButton, "Perfiles", "agregar");
 });
