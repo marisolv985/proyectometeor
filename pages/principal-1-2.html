@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Principal 1.1 | Sistema Corporativo</title>
+  <title>Principal 1.2 | Sistema Corporativo</title>
   <link rel="stylesheet" href="../assets/css/styles.css" />
 </head>
 <body>
@@ -14,7 +14,7 @@
           <div class="brand-logo">PC</div>
           <div class="brand-text">
             <h1>Sistema Corporativo</h1>
-            <p>Principal 1 / Principal 1.1</p>
+            <p>Principal 1 / Principal 1.2</p>
           </div>
         </div>
 
@@ -31,46 +31,51 @@
 
     <main class="page-container">
       <div class="breadcrumbs">
-        Inicio / Principal 1 / <strong>Principal 1.1</strong>
+        Inicio / Principal 1 / <strong>Principal 1.2</strong>
       </div>
 
       <section class="page-header-card">
-        <h2>Principal 1.1</h2>
-        <p>Pantalla estática con botones CRUD visuales.</p>
+        <h2>Principal 1.2</h2>
+        <p>Pantalla estática con tabla visual y acciones de ejemplo.</p>
       </section>
 
-      <section class="content-card">
+      <section class="content-card" id="principal12Content">
         <div class="btn-row" style="margin-bottom:16px;">
-          <button class="btn btn-green">Nuevo</button>
-          <button class="btn btn-blue">Consultar</button>
-          <button class="btn btn-orange">Editar</button>
-          <button class="btn btn-red">Eliminar</button>
-          <button class="btn btn-gray">Detalle</button>
+          <button class="btn btn-green" id="btnP12Nuevo">Nuevo</button>
+          <button class="btn btn-blue" id="btnP12Consultar">Consultar</button>
+          <button class="btn btn-orange" id="btnP12Editar">Editar</button>
+          <button class="btn btn-red" id="btnP12Eliminar">Eliminar</button>
+          <button class="btn btn-gray" id="btnP12Detalle">Detalle</button>
         </div>
 
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Campo 1</label>
-            <input type="text" placeholder="Escribe aquí" />
-          </div>
-
-          <div class="form-group">
-            <label>Campo 2</label>
-            <input type="text" placeholder="Escribe aquí" />
-          </div>
-
-          <div class="form-group">
-            <label>Campo 3</label>
-            <select>
-              <option>Seleccione</option>
-            </select>
-          </div>
-
-          <div class="form-group">
-            <label>Campo 4</label>
-            <input type="date" />
-          </div>
+        <div class="table-wrap">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Estatus</th>
+                <th>Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Registro ejemplo</td>
+                <td>Activo</td>
+                <td>2026-03-22</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Registro ejemplo 2</td>
+                <td>Activo</td>
+                <td>2026-03-22</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
+
+        <div id="principal12Message" class="message-box"></div>
       </section>
     </main>
   </div>
@@ -79,5 +84,7 @@
   <script src="../assets/js/auth.js"></script>
   <script src="../assets/js/navbar-dropdown.js"></script>
   <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/module-permissions.js"></script>
+  <script src="../assets/js/principal-1-2.js"></script>
 </body>
 </html>

@@ -4,7 +4,10 @@ let permisosModulePermissions = null;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    console.log("Iniciando permisos-api.js");
+
     permisosModulePermissions = await getModulePermissions("permisos_perfil");
+    console.log("Permisos del módulo:", permisosModulePermissions);
 
     applyButtonPermissions({
       permissions: permisosModulePermissions,
@@ -45,6 +48,8 @@ async function loadPerfilesForPermisos() {
   try {
     const response = await fetchWithAuth(`${API_BASE_URL}/perfiles`);
     const result = await response.json();
+
+    console.log("Respuesta perfiles:", result);
 
     if (!response.ok || !result.ok) {
       select.innerHTML = `<option value="">No se pudieron cargar perfiles</option>`;
@@ -90,6 +95,8 @@ async function loadPermisosMatrix() {
   try {
     const response = await fetchWithAuth(`${API_BASE_URL}/permisos/perfil/${perfilId}`);
     const result = await response.json();
+
+    console.log("Respuesta matriz permisos:", result);
 
     if (!response.ok || !result.ok) {
       tbody.innerHTML = `<tr><td colspan="6">${result.message || "No se pudo cargar la matriz."}</td></tr>`;
